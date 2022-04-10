@@ -14,9 +14,9 @@ const updateJobs = (req, res) => {
 const deleteJobs = (req, res) => {
     res.send('updateJobs')
 }
-const showJobs = (req, res) => {
+const showStats = (req, res) => {
     res.send('updateJobs')
 }
 
 
-module.exports = { register,login,updateUser}
+module.exports = { createJob ,getAllJobs,updateJobs,deleteJobs,showStats }

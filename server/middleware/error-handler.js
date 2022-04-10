@@ -1,6 +1,14 @@
+const {StatusCodes} = require('http-status-codes')
+
+
 const errorHandleMessage = (err,req,res,next) => {
-    res.status(500).json({
-        message: 'There was an error processing your request'
+    console.log(err)
+    const defaultError = {
+       statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+       msg  : 'Something went wrong . Please try again later'
+    }
+    res.status(defaultError.statusCode).json({
+        msg: err
     })
 }
 
