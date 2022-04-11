@@ -31,7 +31,8 @@ const login = (req, res) => {
 
 
 const updateUser = (req, res) => {
-    res.send('update user')
+    res.send('update user');
+    User.findOneAndUpdate
 }
 
 module.exports = { register,login,updateUser}
