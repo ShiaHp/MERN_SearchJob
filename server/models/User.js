@@ -44,13 +44,18 @@ const UserSchema = new mongoose.Schema({
 UserSchema.pre('save', async function (req, res,next) {
     const salt = await bcryptjs.genSalt(10);
     this.password = await bcryptjs.hash(this.password,salt);
-
     next();
 })
 
 
 UserSchema.methods.createJWT = function () {
     return jwt.sign({userId : this._id},process.env.JWT_SECRET, {expiresIn : process.env.JWT_LIFETIME})
+};
+// available in req.body , mỗi khi gọi hàm
+UserSchema.methods.comparePassword = async function(candidatePassword){
+    const isMatch = await bcryptjs.compare(candidatePassword,this.password);
+    return isMatch
+
 }
 
 const User = mongoose.model('User',UserSchema)

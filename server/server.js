@@ -3,7 +3,7 @@ const app = express();
 const dotenv = require('dotenv')
 dotenv.config()
 const cors = require('cors');
-
+const morgan = require('morgan')
 app.use(cors());
 require('express-async-errors');
 // routes
@@ -15,6 +15,9 @@ const connectDB = require('./db/connect.js')
 const errorHandleMessage = require('./middleware/error-handler');
 const notFoundMiddleware  = require('./middleware/not-found');
 
+if(process.env.NODE_ENV !== 'production') {
+    app.use(morgan('dev'))
+}
 
 
 app.use(express.json())
@@ -33,6 +36,7 @@ app.use(notFoundMiddleware)
 app.use(errorHandleMessage)
 
 const port = process.env.PORT || 2828;
+
 
 
 

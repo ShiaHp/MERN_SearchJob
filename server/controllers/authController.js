@@ -1,7 +1,7 @@
 const User = require ('../models/User')
 const {StatusCodes} = require('http-status-codes')
 
-const {BadRequestError,NotFoundError} = require('../errors/index')
+const {BadRequestError,NotFoundError,Unauthenticated} = require('../errors/index')
 
 
 
@@ -34,8 +34,30 @@ const register = async (req, res,next) => {
    
 }
 
-const login = (req, res) => {
-    res.send('Login user')
+const login =  async (req, res,) => {
+    const {email, password} = req.body;
+    if(!email || !password) {
+        throw new BadRequestError('Please provide all values');
+    };
+
+    const user = await User.findOne({email}).select('+password')
+    if(!user) {
+        throw new Unauthenticated('Invalid Credentials');
+    }
+    console.log(user);
+
+    const isPassword = await user.comparePassword(password);
+    console.log(isPassword)
+    if(!isPassword) {
+        throw new Unauthenticated('Invalid Credentials');
+    }
+
+    const token = user.createJWT();
+    user.password = undefined;
+
+    res.status(StatusCodes.OK).json({
+            user,token,location:user.location
+    })
 }
 
 
