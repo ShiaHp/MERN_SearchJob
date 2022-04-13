@@ -13,7 +13,7 @@ const jobsRouter = require('./routes/jobsRoutes')
 const connectDB = require('./db/connect.js')
 // middleware
 const errorHandleMessage = require('./middleware/error-handler');
-const  notFoundMiddleware  = require('./middleware/not-found');
+const notFoundMiddleware  = require('./middleware/not-found');
 
 
 
