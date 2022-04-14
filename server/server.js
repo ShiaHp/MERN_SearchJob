@@ -14,7 +14,7 @@ const connectDB = require('./db/connect.js')
 // middleware
 const errorHandleMessage = require('./middleware/error-handler');
 const notFoundMiddleware  = require('./middleware/not-found');
-
+const authenticateUser  = require('./middleware/auth')
 if(process.env.NODE_ENV !== 'production') {
     app.use(morgan('dev'))
 }
@@ -29,7 +29,7 @@ app.get('/api/v1', (req, res) => {
 })
 
 app.use('/api/v1/auth',authRouter)
-app.use('/api/v1/jobs',jobsRouter)
+app.use('/api/v1/jobs',authenticateUser,jobsRouter)
 
 
 app.use(notFoundMiddleware)
