@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
-const { UnAuthenticatedError } = require('../errors/index.js') 
+const {  Unauthenticated } = require('../errors/index.js') 
 
-UnAuthenticatedError
+
 const auth = async (req, res, next) => {
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer')) {
-    throw new UnAuthenticatedError('Authentication Invalid')
+    throw new  Unauthenticated('Authentication Invalid')
   }
   const token = authHeader.split(' ')[1]
   try {
@@ -13,7 +13,7 @@ const auth = async (req, res, next) => {
     req.user = { userId: payload.userId }
     next()
   } catch (error) {
-    throw new UnAuthenticatedError('Authentication Invalid')
+    throw new  Unauthenticated('Authentication Invalid')
   }
 }
 
