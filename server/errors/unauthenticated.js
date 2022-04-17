@@ -6,4 +6,4 @@ class Unauthenticated extends Error {
         
     }
 }
-module.exports = Unauthenticated;
+module.exports = Unauthenticated

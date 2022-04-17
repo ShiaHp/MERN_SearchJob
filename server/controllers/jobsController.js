@@ -1,6 +1,8 @@
 const Job = require('../models/Job')
 const {StatusCodes} = require('http-status-codes');
-const {BadRequestError,NotFoundError,Unauthenticated} = require('../errors/index.js')
+const {BadRequestError,NotFoundError,Unauthenticated} = require('../errors/index.js');
+const  checkPermissions  = require('../utils/checkPermissions');
+
 const createJob = async (req, res) => {
       const { position,company} = req.body;
 
@@ -9,7 +11,7 @@ const createJob = async (req, res) => {
       }
 
       req.body.createdBy = req.user.userId;
-
+      
       const job = await Job.create(req.body)
       res.status(StatusCodes.OK).json({
           message: 'Success',
@@ -17,17 +19,60 @@ const createJob = async (req, res) => {
       })
 }
 
-const getAllJobs = (req, res) => {
-    res.send('getAllJobs')
+const getAllJobs = async (req, res) => {
+  const jobs = await Job.find({ createdBy: req.user.userId })
+  
+  res.status(StatusCodes.OK).json({
+      jobs, totalJobs: jobs.length,numOfPages : 1
+  })
 }
 
 
-const updateJobs = (req, res) => {
-    res.send('updateJobs')
+const updateJobs =  async (req, res) => {
+    const { id : jobId}  =req.params;
+    const {company,position ,jobLocation , status} = req.body;
+
+    if(!company || !position || !jobLocation) {
+        throw new BadRequestError('Please provide all values')
+    }
+    const job = await Job.findOne({_id : jobId});
+
+    if(!job) {
+        throw new BadRequestError('Not Found')
+    }
+    // check permission
+
+    checkPermissions(req.user,job.createdBy)
+
+      
+
+    const updatedJob = await Job.findOneAndUpdate({_id : jobId},req.body,{
+        new : true,
+        runValidator : true
+        // không dùng cách này để lưu vì không trigger the hook (hook in models)
+    })
+    // job.position = position;
+    // job.company = company;
+    // job.jobLocation = jobLocation
+    // job.status = status;
+    // await job.save();
+
+    res.status(StatusCodes.OK).json({
+        message : 'Success',
+        updatedJob:updatedJob
+    })
 }
 
-const deleteJobs = (req, res) => {
-    res.send('updateJobs')
+const deleteJobs = async (req, res) => {
+    const {id : jobId} = req.params;
+    const job = await Job.findOne({_id : jobId});
+
+    if(!job) {
+        throw new Error(`No job found with id ${jobId}`);
+    }
+    checkPermissions(req.user,job.createdBy);
+    await job.remove();
+    res.status(StatusCodes.OK).json({message: 'Successfully delete!'})
 }
 const showStats = (req, res) => {
     res.send('updateJobs')
