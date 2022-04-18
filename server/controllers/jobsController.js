@@ -21,7 +21,38 @@ const createJob = async (req, res) => {
 }
 
 const getAllJobs = async (req, res) => {
-  const jobs = await Job.find({ createdBy: req.user.userId })
+
+    const { search,sort,status,jobType} = req.query;
+
+    const queryObject = {
+        createdBy: req.user.userId 
+    }
+    
+    let result = Job.find(queryObject)
+    if(status !== 'all'){
+        queryObject.status = status;
+    }
+    if(jobType !== 'all'){
+        queryObject.jobType = jobType;
+    }
+
+    if(search) {
+        queryObject.position = {$regex : search, $options : 'i'};
+    }
+    if(sort === 'latest'){
+        result = result.sort('-createdAt')
+    }
+    if(sort === 'oldest'){
+        result = result.sort('createdAt')
+    }
+    if(sort === 'z-a'){
+        result = result.sort('-position')
+    }
+        // no await 
+  
+    
+//   chain sort conditions
+    const jobs = await result
   
   res.status(StatusCodes.OK).json({
       jobs, totalJobs: jobs.length,numOfPages : 1
@@ -102,7 +133,7 @@ const showStats = async (req, res) => {
         {$limit : 6}
 
     ])
-    monthlyApplication=    monthlyApplication.map((item,index) =>{
+    monthlyApplication=  monthlyApplication.map((item,index) =>{
         const {_id :{year,month} , count} = item;
         const date= moment().month(month-1).year(year).format('MMM Y')
         return{date,count}
