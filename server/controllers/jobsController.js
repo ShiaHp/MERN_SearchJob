@@ -2,7 +2,7 @@ const Job = require('../models/Job')
 const {StatusCodes} = require('http-status-codes');
 const {BadRequestError,NotFoundError,Unauthenticated} = require('../errors/index.js');
 const  checkPermissions  = require('../utils/checkPermissions');
-
+const mongoose = require('mongoose')
 const createJob = async (req, res) => {
       const { position,company} = req.body;
 
@@ -74,8 +74,26 @@ const deleteJobs = async (req, res) => {
     await job.remove();
     res.status(StatusCodes.OK).json({message: 'Successfully delete!'})
 }
-const showStats = (req, res) => {
-    res.send('updateJobs')
+const showStats = async (req, res) => {
+    let stats = await Job.aggregate([
+        {$match : {createdBy  : mongoose.Types.ObjectId(req.user.userId)}},
+        {$group : {_id : '$status',count :{$sum : 1}}}
+    ])
+
+    stats = stats.reduce((acc, curr) => {
+        const {_id : title,count} = curr;
+        acc[title] = count;
+        return acc;
+    },{})
+
+    const defaultStats = {
+        pending : stats.pending || 0,
+        interview  : stats.interview || 0,
+        declined : stats.declined || 0
+    }
+
+    let monthlyApplication =[]
+    res.status(StatusCodes.OK).json({message: 'Success',defaultStats  , monthlyApplication})
 }
 
 
