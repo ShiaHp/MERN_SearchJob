@@ -1,6 +1,9 @@
 const nodemailer = require('nodemailer')
 
-const sendEmail =  async options =>{
+
+const sendEmail =  async (dataSend) =>{
+
+ 
     // 1, Create a transporter
     const transporter = nodemailer.createTransport({
         host: "smtp.mailtrap.io",
@@ -12,18 +15,28 @@ const sendEmail =  async options =>{
         // Activate in gmail "less secure app" option
     })
     // 2, Define the email options
-    const mailOptions = {
-        from : 'Shiawase@gmail.com',
-        to : options.email,
-        subject : options.subject,
-        text : options.message,
-        // html :
-    }
-    // 3, Actually send the email
+    let info = await transporter.sendMail({
+        from: '"Shia boo 👻" <thienxa282003@gmail.com>', 
+        to: dataSend.receiverEmail, 
+        subject: "Yêu cầu khôi phục lại mật khẩu ", 
 
-   await transporter.sendMail(mailOptions)
-    // return promise
+        html: `
+        <h3> Xin chào khách hàng ${dataSend.UserName}</h3>
+        <p>  Bạn nhận được email này vì đã yêu cầu khôi phục lại mật khẩu trên trang web ${dataSend.website}   </p>
+        <p>  Vui lòng click vào đường link bên dưới , để xác nhận hoàn tất thủ tục khôi phục lại mật khẩu
+        
+        </p>
+        <div>  <a href='http://localhost:3000/reset/${dataSend.resetToken}' target= "_blank"> Click here</a></div> 
+        `, // html body
+      });
+
+
+
+
 };
+
+
+
 
 
 module.exports = sendEmail 

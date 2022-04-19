@@ -1,6 +1,7 @@
 const User = require ('../models/User')
 const {StatusCodes} = require('http-status-codes')
 const sendEmail = require('../utils/sendEmail')
+const cron = require('node-cron');
 const {BadRequestError,NotFoundError,Unauthenticated} = require('../errors/index')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken');
@@ -107,11 +108,21 @@ const forgotPassword = async(req, res) => {
         try{
           
                 await sendEmail({
-                    email : user.email,
-                    subject : 'Your password reset token (valid for 10 minutes)',
-                    message
+                    receiverEmail : user.email,
+                    UserName : user.name,
+                    website : "Jobfun",
+                    redirectLink : resetURL,
+                    resetToken : resetToken
                 })
-               
+
+                cron.schedule('0 */1 * * * *', async () => {
+                    await transporter.sendMail({
+                        email : user.email,
+                        subject : 'Your password reset token (valid for 10 minutes)',
+                        message,
+                        
+                    })
+                 });
                 res.status(StatusCodes.OK).json({
                     status : 'success',
                     message : 'Token send to email !'
