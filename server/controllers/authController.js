@@ -50,10 +50,10 @@ const login =  async (req, res,) => {
     if(!user) {
         throw new Unauthenticated('Invalid Credentials');
     }
-    console.log(user);
+  
 
     const isPassword = await user.comparePassword(password);
-    console.log(isPassword)
+    
     if(!isPassword) {
         throw new Unauthenticated('Invalid Credentials');
     }

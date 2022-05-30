@@ -66,7 +66,7 @@ UserSchema.pre('save', async function (req, res,next) {
     if(!this.isModified('password') && !this.isModified('passwordConfirm')) return 
     const salt = await bcryptjs.genSalt(10);
     this.password = await bcryptjs.hash(this.password,salt);
-     
+    this.passwordConfirm = await bcryptjs.hash(this.passwordConfirm,salt);
     // // delete password confirm fields
     // this.passwordConfirm = undefined;
     // next();
