@@ -66,7 +66,18 @@ const login =  async (req, res,) => {
     })
 }
 
-
+const loginWithGoogle = async (req,res) => {
+    const {email,facebookId} = req.body;
+    if(!email || !facebookId) {
+        throw new BadRequestError('Please provide all values')
+    }
+    const user = await User.findOne({email: email})
+    if(!user) {   throw new Unauthenticated('Invalid Credentials');}
+    const token = user.createJWT();
+    res.status(200).json({
+        user,token,location:user.location
+    })
+}
 const updateUser =  async (req, res) => {
     const {email,name,lastName,location} = req.body;
     
@@ -172,4 +183,4 @@ const resetPassword =async(req, res ,next) => {
 }
 
 
-module.exports = { register,login,updateUser, forgotPassword,resetPassword}
+module.exports = { register,login,updateUser, forgotPassword,resetPassword,loginWithGoogle}

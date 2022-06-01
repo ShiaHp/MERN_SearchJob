@@ -3,6 +3,7 @@ const validator = require('validator');
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto')
+
 const UserSchema = new mongoose.Schema({
     name : {
         type : String,
@@ -29,13 +30,13 @@ const UserSchema = new mongoose.Schema({
     },
     password : {
         type : String,
-        required: [true,'Please provider password'],
+        // required: [true,'Please provider password'],
         minlength : 6,
         select : false,
     },
     passwordConfirm : {
         type : String,
-        required: [true, 'Please confirm your password'],
+        // required: [true, 'Please confirm your password'],
         validate : {
             validator : function(el) {
                 return el === this.password  ; // abc === abc return true  , else false 
@@ -45,7 +46,12 @@ const UserSchema = new mongoose.Schema({
         },
         select : false,
     },
-
+    facebookId :{
+        type : String,
+    },
+    avatar : {
+        type : String,
+    },
     location : {
         type : String,
         trim : true,
