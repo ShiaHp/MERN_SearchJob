@@ -4,6 +4,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 const cors = require('cors');
 const morgan = require('morgan')
+const auth = require('../server/middleware/auth')
 app.use(cors({
     origin: "http://localhost:3000", // allow to server to accept request from different origin
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -13,7 +14,7 @@ require('express-async-errors');
 const passport = require('passport')
 const session = require('express-session');
  require('../server/config/auth');
-
+ app.use('/public/uploads', express.static(__dirname + '/public/uploads'));
 // routes
 const authRouter = require('./routes/authRoutes')
 const jobsRouter = require('./routes/jobsRoutes')
@@ -90,7 +91,7 @@ app.get('/api/v1', (req, res) => {
 // )
 
 app.use('/api/v1/auth',authRouter)
-app.use('/api/v1/jobs',authenticateUser,jobsRouter)
+app.use('/api/v1/jobs',auth,jobsRouter)
 
 
 app.use(notFoundMiddleware)

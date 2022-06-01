@@ -49,7 +49,7 @@ const UserSchema = new mongoose.Schema({
     facebookId :{
         type : String,
     },
-    avatar : {
+    avatar:{
         type : String,
     },
     location : {
@@ -64,6 +64,13 @@ const UserSchema = new mongoose.Schema({
 
 
 
+UserSchema.virtual('id').get(function () {
+    return this._id.toHexString();
+});
+
+UserSchema.set('toJSON', {
+    virtuals: true,
+});
 
 
 

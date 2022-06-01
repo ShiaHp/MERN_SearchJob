@@ -6,7 +6,7 @@ const mongoose = require('mongoose')
 const moment = require('moment');
 const createJob = async (req, res) => {
       const { position,company} = req.body;
-
+      
       if(!position || !company) {
           throw new BadRequestError('Please provide all values')
       }
@@ -22,7 +22,7 @@ const createJob = async (req, res) => {
 
 const getAllJobs = async (req, res) => {
     const { status, jobType, sort, search } = req.query
-  
+
     const queryObject = {
       createdBy: req.user.userId,
     }
@@ -57,7 +57,7 @@ const getAllJobs = async (req, res) => {
       result = result.sort('-position')
     }
   
-    //
+
         // no await 
   
        const page = Number(req.query.page) || 1
