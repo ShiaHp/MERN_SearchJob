@@ -71,7 +71,7 @@ const signToken = id =>{
 }
 
 const register = async (req, res,next) => {
-    const {name,email,password,passwordConfirm } = req.body;
+    const {name,email,password,passwordConfirm,isAdmin } = req.body;
 
 
     if(!name || !email || !password || !passwordConfirm ) {
@@ -83,7 +83,7 @@ const register = async (req, res,next) => {
     if(userAlreadyExists){
         throw new BadRequestError('Email already in use');
     }
-    const user = await User.create({name,email,password,passwordConfirm});
+    const user = await User.create({name,email,password,passwordConfirm,isAdmin});
     const token = user.createJWT();
 
     res.status(StatusCodes.CREATED).json({ 
@@ -94,6 +94,8 @@ const register = async (req, res,next) => {
                 lastName : user.lastName,
                 location : user.location,
                 name : user.name,
+                isAdmin : user.isAdmin
+                
             }
          });
    
@@ -106,10 +108,12 @@ const login =  async (req, res,) => {
     };
 
     const user = await User.findOne({email}).select('+password')
+    
     if(!user) {
         throw new Unauthenticated('Invalid Credentials');
     }
-  
+   
+
 
     const isPassword = await user.comparePassword(password);
     
@@ -117,7 +121,13 @@ const login =  async (req, res,) => {
         throw new Unauthenticated('Invalid Credentials');
     }
 
-    const token = user.createJWT();
+    const token = jwt.sign(
+        {
+            isAdmin: user.isAdmin
+        },
+          process.env.JWT_SECRET,
+        {expiresIn : '1d'}
+    )
     user.password = undefined;
 
     res.status(StatusCodes.OK).json({
@@ -221,6 +231,68 @@ const resetPassword =async(req, res ,next) => {
 
     })
 }
+    const getAllUsers = async (req, res) =>{
+    
+        const {sort,search,isAdmin} = req.query
+
+        const queryObject ={
+            createdBy : req.user.userId
+        }
+   
+        if(isAdmin && isAdmin !=='all'){
+            queryObject.isAdmin = isAdmin
+        }
+        if(search){
+            queryObject.name = {$regex:search , $options: 'i'}
+        }
+      
+        let result = User.find(queryObject)
+          
+    if (sort === 'latest') {
+        result = result.sort('-createdAt')
+      }
+      if (sort === 'oldest') {
+        result = result.sort('createdAt')
+      }
 
 
-module.exports = { register,login,updateUser, forgotPassword,resetPassword,loginWithGoogle}
+      const page = Number(req.query.page) || 1 ;
+      const limit = Number(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      result = result.skip(skip).limit(limit);
+
+    
+        try {
+            const users = await result
+        
+            const totalUsers = await User.countDocuments(queryObject)
+            const numOfPages = Math.ceil(totalUsers /limit)
+            // const token = jwt.sign({isAdmin: users.users.isAdmin},process.env.JWT_SECRET,{
+            //     expiresIn : process.env.JWT_LIFETIME
+            // })
+            res.status(200).json({
+                message : 'Success',
+                users ,
+                totalUsers,
+                numOfPages
+            });
+
+        } catch (error) {
+                console.log(error)
+        }
+    }
+
+const deleteUser = async (req, res) => {
+    const {id} = req.params
+            try {
+               await User.findByIdAndDelete(id);
+                res.status(200).send({ message: 'Success'})
+            } catch (error) {
+                res.status(404).json({   messages : error.message})
+             
+            }
+    }
+
+
+module.exports = { register,login,updateUser, forgotPassword,resetPassword,loginWithGoogle,getAllUsers,deleteUser }

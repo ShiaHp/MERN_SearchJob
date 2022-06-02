@@ -18,6 +18,7 @@ const session = require('express-session');
 // routes
 const authRouter = require('./routes/authRoutes')
 const jobsRouter = require('./routes/jobsRoutes')
+const usersRouter = require('./routes/usersRouter')
 // 
 const connectDB = require('./db/connect.js')
 // middleware
@@ -92,7 +93,7 @@ app.get('/api/v1', (req, res) => {
 
 app.use('/api/v1/auth',authRouter)
 app.use('/api/v1/jobs',auth,jobsRouter)
-
+app.use('/api/v1/users',auth,usersRouter)
 
 app.use(notFoundMiddleware)
 app.use(errorHandleMessage)

@@ -50,6 +50,9 @@ const UserSchema = new mongoose.Schema({
         type : String,
     },
     avatar:{
+        type : String
+    },
+    isAdmin : {
         type : String,
     },
     location : {

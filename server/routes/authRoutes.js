@@ -2,7 +2,7 @@ const express = require('express')
 const authenticateUser  = require('../middleware/auth')
 const User = require ('../models/User')
 const router = express.Router();
-const {register,login,updateUser,forgotPassword,resetPassword,loginWithGoogle} =require('../controllers/authController');
+const {register,login,updateUser,forgotPassword,resetPassword,loginWithGoogle,getAllUsers} =require('../controllers/authController');
 const multer = require('multer');
 
 const FILE_TYPE_MAP = {
@@ -65,4 +65,5 @@ router.patch('/updateUser/:id',uploadOptions.single('avatar'),async (req, res) =
 });
 router.route('/forgotPassword').post(forgotPassword);
 router.route('/resetPassword/:token').post(resetPassword);
+
 module.exports = router;
