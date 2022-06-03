@@ -34,7 +34,7 @@ router.route('/register').post(register);
 router.route('/login').post(login);
 router.route('/loginWithGoogle').post(loginWithGoogle);
 router.patch('/updateUser/:id',uploadOptions.single('avatar'),async (req, res) => {
-    console.log(req.body)
+
     const file = req.file;
     if (!file) return res.status(400).send('No image in the request');
 
